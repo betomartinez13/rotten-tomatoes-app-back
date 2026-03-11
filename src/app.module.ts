@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { CategoriesModule } from './categories/categories.module';
 import { MoviesModule } from './movies/movies.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MoviesModule } from './movies/movies.module';
     UsersModule,
     CategoriesModule,
     MoviesModule,
-    // Comments se agrega en fase posterior
+    CommentsModule,
   ],
   providers: [
     {
