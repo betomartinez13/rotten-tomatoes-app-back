@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  CRITIC
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  name         String
+  role         Role      @default(USER)
+  refreshToken String?
+  comments     Comment[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Movie {
+  id           String          @id @default(uuid())
+  tmdbId       Int             @unique
+  title        String
+  synopsis     String?
+  releaseDate  DateTime?
+  posterUrl    String?
+  backdropUrl  String?
+  runtime      Int?
+  userRating   Float           @default(0)
+  criticRating Float           @default(0)
+  popularity   Float           @default(0)
+  categories   MovieCategory[]
+  comments     Comment[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([title])
+  @@index([userRating])
+  @@index([criticRating])
+  @@index([releaseDate])
+  @@map("movies")
+}
+
+model Category {
+  id     Int             @id
+  name   String          @unique
+  movies MovieCategory[]
+
+  @@map("categories")
+}
+
+model MovieCategory {
+  movieId    String
+  categoryId Int
+  movie      Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, categoryId])
+  @@map("movie_categories")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  score     Int
+  userId    String
+  movieId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, movieId])
+  @@map("comments")
+}
