@@ -21,8 +21,8 @@ async function bootstrap() {
 
   // Swagger
   const config = new DocumentBuilder()
-    .setTitle('Recipe API')
-    .setDescription('REST API for recipe management')
+    .setTitle('CineRank API')
+    .setDescription('Backend de CineRank - Reseñas de películas y series')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
