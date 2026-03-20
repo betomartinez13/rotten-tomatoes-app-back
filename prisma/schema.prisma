@@ -17,8 +17,10 @@ model User {
   password     String
   name         String
   role         Role      @default(USER)
-  refreshToken String?
-  comments     Comment[]
+  refreshToken      String?
+  resetCode         String?
+  resetCodeExpiry   DateTime?
+  comments          Comment[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
