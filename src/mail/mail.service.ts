@@ -17,6 +17,7 @@ export class MailService {
   }
 
   async sendVerificationCode(to: string, code: string, name: string) {
+    console.log(`[Mail] Verification code sent to ${to}`);
     await this.transporter.sendMail({
       from: `"CineRank" <${this.config.getOrThrow<string>('GMAIL_USER')}>`,
       to,
@@ -35,6 +36,7 @@ export class MailService {
   }
 
   async sendResetCode(to: string, code: string, name: string) {
+    console.log(`[Mail] Password reset code sent to ${to}`);
     await this.transporter.sendMail({
       from: `"CineRank" <${this.config.getOrThrow<string>('GMAIL_USER')}>`,
       to,
