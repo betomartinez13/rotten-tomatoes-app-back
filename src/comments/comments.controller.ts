@@ -34,6 +34,12 @@ export class CommentsController {
     return this.commentsService.remove(id, user.id);
   }
 
+  @Get('me')
+  @ApiOperation({ summary: 'Get all comments by the authenticated user' })
+  findMine(@CurrentUser() user: { id: string }) {
+    return this.commentsService.findByUser(user.id);
+  }
+
   @Get('movie/:movieId')
   @ApiOperation({ summary: 'Get all comments for a movie' })
   findByMovie(@Param('movieId') movieId: string) {

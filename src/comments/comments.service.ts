@@ -55,6 +55,14 @@ export class CommentsService {
     await this.recalculateMovieRatings(comment.movieId);
   }
 
+  async findByUser(userId: string) {
+    return this.prisma.comment.findMany({
+      where: { userId },
+      include: { movie: { select: { id: true, title: true, posterUrl: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findByMovie(movieId: string) {
     const movie = await this.prisma.movie.findUnique({ where: { id: movieId } });
     if (!movie) throw new NotFoundException('Movie not found');
