@@ -18,6 +18,9 @@ model User {
   name         String
   role         Role      @default(USER)
   refreshToken      String?
+  isVerified        Boolean   @default(false)
+  verifyCode        String?
+  verifyCodeExpiry  DateTime?
   resetCode         String?
   resetCodeExpiry   DateTime?
   comments          Comment[]

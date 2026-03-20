@@ -6,6 +6,8 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -41,6 +43,25 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshTokens(dto.refreshToken);
+  }
+
+  @Post('verify-email')
+  @Public()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Verify email with code — returns tokens on success' })
+  @ApiResponse({ status: 200, description: 'Email verified, tokens returned' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired code' })
+  verifyEmail(@Body() dto: VerifyEmailDto) {
+    return this.authService.verifyEmail(dto);
+  }
+
+  @Post('resend-verification')
+  @Public()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Resend email verification code' })
+  @ApiResponse({ status: 200, description: 'Code resent if email exists' })
+  resendVerification(@Body() dto: ResendVerificationDto) {
+    return this.authService.resendVerification(dto);
   }
 
   @Post('forgot-password')
