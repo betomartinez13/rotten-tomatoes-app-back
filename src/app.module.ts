@@ -14,7 +14,7 @@ import { CommentsModule } from './comments/comments.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60000, limit: 10 }],
+      throttlers: [{ ttl: 60000, limit: 100 }],
     }),
     PrismaModule,
     AuthModule,

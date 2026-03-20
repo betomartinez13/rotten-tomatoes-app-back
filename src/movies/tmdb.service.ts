@@ -18,6 +18,19 @@ export class TmdbService {
     this.imageBase = config.getOrThrow<string>('TMDB_IMAGE_BASE_URL');
   }
 
+  async getPopularMovies(page = 1) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.baseUrl}/movie/popular`, {
+          params: { api_key: this.apiKey, language: 'es-ES', page },
+        }),
+      );
+      return data.results as any[];
+    } catch {
+      throw new ServiceUnavailableException('TMDB service unavailable');
+    }
+  }
+
   async searchMovies(query: string) {
     try {
       const { data } = await firstValueFrom(

@@ -2,15 +2,11 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as bcrypt from 'bcrypt';
 import { createHash } from 'crypto';
 
@@ -19,7 +15,6 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
-    private mail: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -43,7 +38,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    const { password, refreshToken, resetCode, resetCodeExpiry, isVerified, verifyCode, verifyCodeExpiry, ...safe } = user;
+    const { password, refreshToken, ...safe } = user;
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -64,11 +59,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-
     const tokens = await this.generateTokens(user.id, user.email);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    const { password, refreshToken, resetCode, resetCodeExpiry, isVerified, verifyCode, verifyCodeExpiry, ...safe } = user;
+    const { password, refreshToken, ...safe } = user;
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -103,46 +97,6 @@ export class AuthService {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
-  }
-
-  async forgotPassword(dto: ForgotPasswordDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    // Always return same message to avoid email enumeration
-    if (!user) return { message: 'If that email exists, a code was sent' };
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { resetCode: code, resetCodeExpiry: expiry },
-    });
-
-    await this.mail.sendResetCode(user.email, code, user.name);
-    return { message: 'If that email exists, a code was sent' };
-  }
-
-  async resetPassword(dto: ResetPasswordDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user || !user.resetCode || !user.resetCodeExpiry) {
-      throw new BadRequestException('Invalid or expired code');
-    }
-
-    if (user.resetCode !== dto.code) {
-      throw new BadRequestException('Invalid or expired code');
-    }
-
-    if (new Date() > user.resetCodeExpiry) {
-      throw new BadRequestException('Invalid or expired code');
-    }
-
-    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword, resetCode: null, resetCodeExpiry: null, refreshToken: null },
-    });
-
-    return { message: 'Password updated successfully' };
   }
 
   async logout(userId: string) {

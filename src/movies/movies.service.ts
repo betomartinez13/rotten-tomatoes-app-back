@@ -11,6 +11,19 @@ export class MoviesService {
     private tmdbService: TmdbService,
   ) {}
 
+  async populatePopular() {
+    const results = await this.tmdbService.getPopularMovies();
+    let saved = 0;
+    for (const result of results) {
+      const exists = await this.prisma.movie.findUnique({ where: { tmdbId: result.id } });
+      if (!exists) {
+        await this.saveMovieFromTmdb(result.id);
+        saved++;
+      }
+    }
+    return { message: `Populated ${saved} new movies` };
+  }
+
   async search(query: string) {
     const tmdbResults = await this.tmdbService.searchMovies(query);
 

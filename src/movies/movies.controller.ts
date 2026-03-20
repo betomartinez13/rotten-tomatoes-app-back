@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { MoviesService } from './movies.service';
 import { MovieFilterDto } from './dto/movie-filter.dto';
@@ -8,6 +8,12 @@ import { MovieFilterDto } from './dto/movie-filter.dto';
 @Controller('movies')
 export class MoviesController {
   constructor(private moviesService: MoviesService) {}
+
+  @Post('populate')
+  @ApiOperation({ summary: 'Populate DB with popular movies from TMDB' })
+  populate() {
+    return this.moviesService.populatePopular();
+  }
 
   @Get('search')
   @ApiOperation({ summary: 'Search movies from TMDB (persists locally)' })

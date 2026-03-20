@@ -4,8 +4,6 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -41,25 +39,6 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshTokens(dto.refreshToken);
-  }
-
-  @Post('forgot-password')
-  @Public()
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Send password reset code to email' })
-  @ApiResponse({ status: 200, description: 'Code sent if email exists' })
-  forgotPassword(@Body() dto: ForgotPasswordDto) {
-    return this.authService.forgotPassword(dto);
-  }
-
-  @Post('reset-password')
-  @Public()
-  @HttpCode(200)
-  @ApiOperation({ summary: 'Reset password using code received by email' })
-  @ApiResponse({ status: 200, description: 'Password updated successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid or expired code' })
-  resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.authService.resetPassword(dto);
   }
 
   @Post('logout')
