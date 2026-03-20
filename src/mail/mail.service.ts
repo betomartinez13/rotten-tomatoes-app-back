@@ -1,25 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class MailService {
-  private transporter: nodemailer.Transporter;
+  private resend: Resend;
 
   constructor(private config: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: this.config.getOrThrow<string>('GMAIL_USER'),
-        pass: this.config.getOrThrow<string>('GMAIL_APP_PASSWORD'),
-      },
-    });
+    this.resend = new Resend(this.config.getOrThrow<string>('RESEND_API_KEY'));
   }
 
   async sendVerificationCode(to: string, code: string, name: string) {
     console.log(`[Mail] Verification code sent to ${to}`);
-    await this.transporter.sendMail({
-      from: `"CineRank" <${this.config.getOrThrow<string>('GMAIL_USER')}>`,
+    await this.resend.emails.send({
+      from: 'CineRank <onboarding@resend.dev>',
       to,
       subject: 'Verifica tu cuenta en CineRank',
       html: `
@@ -37,8 +31,8 @@ export class MailService {
 
   async sendResetCode(to: string, code: string, name: string) {
     console.log(`[Mail] Password reset code sent to ${to}`);
-    await this.transporter.sendMail({
-      from: `"CineRank" <${this.config.getOrThrow<string>('GMAIL_USER')}>`,
+    await this.resend.emails.send({
+      from: 'CineRank <onboarding@resend.dev>',
       to,
       subject: 'Código para restablecer tu contraseña',
       html: `
